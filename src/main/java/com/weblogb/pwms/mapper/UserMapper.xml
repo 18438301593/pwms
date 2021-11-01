@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weblogb.pwms.mapper.UserMapper">
+
+    <select id="alreadyRegister" resultType="int">
+        select 1 from user limit 1
+    </select>
+
+    <insert id="register">
+        insert into user(username,password)value(#{request.username},#{request.password})
+    </insert>
+
+    <select id="getUserByUserName" resultType="com.weblogb.pwms.model.User">
+        select username,password from user where username = #{username} limit 1
+    </select>
+
+</mapper>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+    <link rel="shortcut icon" th:href="@{/ico/pwms.ico}">
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <style>
+        .el-main{
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <template>
+        <el-container>
+            <el-header>
+                <div style="color: #409EFF;font-size: 40px;width: 690px;margin: auto;margin-top: 10px;">
+                    <b><i class="el-icon-key" ></i>PWMS</b>
+                </div>
+            </el-header>
+            <el-main style="width: 690px;margin: auto;">
+                <div style="width: 300px;">
+                    <el-input
+                            placeholder="请输入账号"
+                            v-model="username"
+                            clearable>
+                    </el-input>
+                    <el-input style="margin-top: 10px;" placeholder="请输入密码" v-model="password" show-password></el-input>
+                    <el-button type="primary" style="margin-top: 10px;" @click="onSubmit">注册</el-button>
+                </div>
+            </el-main>
+        </el-container>
+    </template>
+</div>
+</body>
+<script th:src="@{/js/vue.js}"></script>
+<script th:src="@{/js/index.js}"></script>
+<script th:src="@{/crypto/crypto-js.js}"></script>
+<script th:src="@{/jsencrypt/jsencrypt.js}"></script>
+<script th:src="@{/js/aesUtil.js}"></script>
+<script th:src="@{/js/rsaUtil.js}"></script>
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/ajaxes.js}"></script>
+<script type="application/javascript">
+    function checkPass(s){
+        if(s.length < 12){
+            return 0;
+        }
+        var ls = 0;
+        if(s.match(/([a-z])+/)){
+            ls++;
+        }
+        if(s.match(/([0-9])+/)){
+            ls++;
+        }
+        if(s.match(/([A-Z])+/)){
+            ls++;
+        }
+        if(s.match(/[^a-zA-Z0-9]+/)){
+            ls++;
+        }
+        return ls
+    }
+    sessionStorage.setItem('javaPublicKey', '[[${publicKey}]]');
+    window.onload = function () {
+        new Vue({
+            el: '#app',
+            data: {
+                username:"",
+                password:""
+            },
+            methods: {
+                onSubmit() {
+                    if(this.username==null || this.username.length<6){
+                        this.$message.error('请输入用户名，且6位以上');
+                        return;
+                    }
+                    if(this.password==null || this.password.length<12){
+                        this.$message.error('密码长度必须12位以上');
+                        return;
+                    }
+                    if(checkPass(this.password)<4){
+                        this.$message.error('密码必须包含大小写字母以及数字和特殊字符');
+                        return;
+                    }
+                    var pass = CryptoJS.SHA256(this.username+"-"+this.password).toString()
+                    $.post("/user/register",{username:this.username,password:pass},function(result){
+                        if(result.data == true){
+                            window.location.href="/user/login";
+                        }
+                    });
+                }
+            }
+        })
+    }
+</script>
+</html>

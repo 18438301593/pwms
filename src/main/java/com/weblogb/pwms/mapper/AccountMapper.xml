@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weblogb.pwms.mapper.AccountMapper">
+
+    <select id="list" resultType="com.weblogb.pwms.model.Acc">
+        select id,account,platform from acc_pwd
+    </select>
+
+    <select id="look" resultType="java.lang.String">
+        select password from acc_pwd where id = #{id} limit 1
+    </select>
+
+    <select id="tips" resultType="java.lang.String">
+        select tips from acc_pwd where id = #{id} limit 1
+    </select>
+
+    <insert id="add" parameterType="com.weblogb.pwms.model.AccPwd"
+        useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into acc_pwd(platform,account,password,tips)values(#{acc.platform},#{acc.account},#{acc.password},#{acc.tips})
+    </insert>
+
+    <update id="update">
+        update acc_pwd set
+        platform=#{acc.platform},
+        account = #{acc.account}
+        <if test="acc.password !=null and acc.password != ''">
+            ,password=#{acc.password}
+        </if>
+        <if test="acc.tips !=null  and acc.tips != ''">
+            ,tips = #{acc.tips}
+        </if>
+        where id = #{acc.id}
+    </update>
+
+    <delete id="del">delete from acc_pwd where id = #{id}</delete>
+
+</mapper>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <link rel="shortcut icon" th:href="@{/ico/pwms.ico}"  type="image/x-icon" />
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <style>
+        .el-dialog__body{
+            padding-top: 15px !important;
+            padding-bottom: 0px !important;
+        }
+        .el-dialog{
+            width: 400px !important;
+        }
+        .el-form-item {
+             margin-bottom: 5px !important;
+        }
+        .el-main{
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+        .cell > .el-button+.el-button {
+            margin-left: 0px !important;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+<template>
+    <el-dialog title="录入" :visible.sync="dialogAddVisible">
+        <el-form :model="addForm">
+            <el-form-item label="平台" :label-width="formLabelWidth">
+                <el-input v-model="addForm.platform" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="账号" :label-width="formLabelWidth">
+                <el-input v-model="addForm.account" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="钥匙" :label-width="formLabelWidth">
+                <el-input v-model="addForm.password" style="width: 217px;" autocomplete="off"></el-input>
+                <el-button @click="randomGeneration(0)">随机生成</el-button>
+            </el-form-item>
+            <el-form-item label="提示" :label-width="formLabelWidth">
+                <el-input v-model="addForm.tips" autocomplete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogAddVisible=false">取 消</el-button>
+            <el-button type="primary" @click="addSubmit()">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="修改" :visible.sync="dialogUpdateVisible">
+        <el-form :model="updateForm">
+            <el-form-item label="平台" :label-width="formLabelWidth">
+                <el-input v-model="updateForm.platform" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="账号" :label-width="formLabelWidth">
+                <el-input v-model="updateForm.account" autocomplete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="钥匙" :label-width="formLabelWidth">
+                <el-input v-model="updateForm.password" style="width: 217px;" autocomplete="off"></el-input>
+                <el-button @click="randomGeneration(1)">随机生成</el-button>
+            </el-form-item>
+            <el-form-item label="提示" :label-width="formLabelWidth">
+                <el-input v-model="updateForm.tips" autocomplete="off"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogUpdateVisible=false">取 消</el-button>
+            <el-button type="primary" @click="updateSubmit()">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-container>
+        <el-header>
+            <div style="width: 690px;margin: auto;margin-top: 10px;">
+                <span style="color: #409EFF;font-size: 40px;"><b><i class="el-icon-key" ></i>PWMS</b></span>
+                <span style="float: right;margin-top: 30px;">
+                    <a style="color: crimson !important;text-decoration:none;"
+                                                                th:href="@{/user/logout}">退出</a>
+                </span>
+            </div>
+        </el-header>
+        <el-main style="width: 690px;margin: auto;">
+            <el-table
+                    height="350"
+                    border
+                    :data="account"
+                    style="width: 100%">
+                <el-table-column
+                        label="平台"
+                        width="160">
+                    <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag size="medium">{{ scope.row.platform }}</el-tag>
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        label="账号"
+                        width="210">
+                    <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">
+                            <el-tag type="warning" size="medium">{{ scope.row.account }}</el-tag>
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button
+                                plain
+                                size="mini"
+                                type="danger"
+                                @click="look(scope.$index, account)">查看</el-button>
+                        <el-button
+                                size="mini"
+                                @click="copy(scope.$index, account)">复制</el-button>
+                        <el-button
+                                size="mini"
+                                @click="tips(scope.$index, account)">提示</el-button>
+                        <el-button
+                                size="mini"
+                                @click="update(scope.$index, scope.row)">修改</el-button>
+                        <el-button
+                                size="mini"
+                                @click="del(scope.$index, account)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-button type="warning" plain size="mini" style="margin-top: 10px;" @click="add">录入</el-button>
+        </el-main>
+    </el-container>
+</template>
+</div>
+</body>
+<script th:src="@{/js/vue.js}"></script>
+<script th:src="@{/js/index.js}"></script>
+<script th:src="@{/crypto/crypto-js.js}"></script>
+<script th:src="@{/jsencrypt/jsencrypt.js}"></script>
+<script th:src="@{/js/aesUtil.js}"></script>
+<script th:src="@{/js/rsaUtil.js}"></script>
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/ajaxes.js}"></script>
+<script type="application/javascript">
+
+    function randomPassword(length) {
+        length = Number(length)
+        if (length < 6) {
+            length = 6
+        } else if (length > 16) {
+            length = 16
+        }
+        let passwordArray = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz', '1234567890', '!@#$%&*()'];
+        var password = [];
+        let n = 0;
+        for (let i = 0; i < length; i++) {
+            if ( password.length < (length - 4) ) {
+                let arrayRandom = Math.floor(Math.random() * 4);
+                let passwordItem = passwordArray[arrayRandom];
+                let item = passwordItem[Math.floor(Math.random() * passwordItem.length)];
+                password.push(item);
+            } else {
+                let newItem = passwordArray[n];
+                let lastItem = newItem[Math.floor(Math.random() * newItem.length)];
+                let spliceIndex = Math.floor(Math.random() * password.length);
+                password.splice(spliceIndex, 0, lastItem);
+                n++
+            }
+        }
+        return password.join("");
+    }
+    window.onload = function () {
+        new Vue({
+            el: '#app',
+            data: {
+                account:[],
+                dialogAddVisible: false,
+                dialogUpdateVisible: false,
+                formLabelWidth: '40px',
+                addForm:{
+                    platform:null,
+                    account:null,
+                    password:null,
+                    tips:null
+                },
+                updateForm:{
+                    id:null,
+                    platform:null,
+                    account:null,
+                    password:null,
+                    tips:null,
+                    index:null
+                }
+            },
+            methods: {
+                look(index,rows) {
+                    let th = this;
+                    this.$confirm('请检查周围环境是否安全?', '警示', {
+                        confirmButtonText: '安全',
+                        cancelButtonText: '取消',
+                        type: 'warning',
+                        center: true
+                    }).then(() => {
+                        $.post("/account/look",{id:rows[index].id},function(result){
+                            if(!result.flag){
+                                th.$message.error(result.msg);
+                            }else{
+                                th.$alert('密码：<span class="el-tag el-tag--danger el-tag--medium el-tag--light">'+result.data+'</span> 三秒后自动关闭',
+                                    '危险警告', {
+                                        dangerouslyUseHTMLString: true,
+                                        confirmButtonClass:"auto-close",
+                                        type: 'warning',
+                                    });
+                                setTimeout(() => {
+                                    let a = document.body.getElementsByClassName("auto-close")[0];
+                                    a.click();
+                                }, 3000);
+                            }
+                        });
+                    }).catch(() => {
+
+                    });
+                },
+                add(){
+                    this.dialogAddVisible=true;
+                },
+                update(index,row){
+                    this.updateForm.id=row.id;
+                    this.updateForm.platform=row.platform;
+                    this.updateForm.account=row.account;
+                    this.updateForm.index = index;
+                    this.dialogUpdateVisible=true;
+                },
+                del(index,rows){
+                    let th =this;
+                    this.$confirm('确定要删除吗？删除之后无法找回', '警告', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning',
+                        center: true
+                    }).then(() => {
+                        $.post("/account/del",{id:rows[index].id},function(result){
+                            if(!result.flag){
+                                th.$message.error(result.msg);
+                            }else{
+                                rows.splice(index, 1);
+                                th.$message({
+                                    message: result.msg,
+                                    type: 'success'
+                                });
+                            }
+                        });
+                    }).catch(() => {
+
+                    });
+                },
+                tips(index,rows){
+                    let th =this;
+                    $.post("/account/tips",{id:rows[index].id},function(result){
+                        if(!result.flag){
+                            th.$message.error(result.msg);
+                        }else{
+                            th.$alert('tips：<span class="el-tag el-tag--danger el-tag--medium el-tag--light">'+result.data+'</span>',
+                                '危险警告', {
+                                    dangerouslyUseHTMLString: true,
+                                    type: 'warning',
+                                });
+                        }
+                    });
+                },
+                copy(index,rows){
+                    var th = this;
+                    $.post("/account/look",{id:rows[index].id},function(result){
+                        if(!result.flag){
+                            th.$message.error(result.msg);
+                        }else{
+                            th.copyToClip(result.data);
+                        }
+                    });
+                },
+                copyToClip(content) {
+                    let ele = document.createElement("input");
+                    ele.setAttribute("value", content);
+                    document.body.appendChild(ele);
+                    ele.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(ele);
+                    this.$message({
+                        message: "已复制到剪切板",
+                        type: 'success'
+                    });
+                },
+                clearAddForm(){
+                    this.addForm.platform=null;
+                    this.addForm.account=null;
+                    this.addForm.password=null;
+                    this.addForm.tips=null;
+                },
+                clearUpdateForm(){
+                    this.updateForm.id=null;
+                    this.updateForm.platform=null;
+                    this.updateForm.account=null;
+                    this.updateForm.password=null;
+                    this.updateForm.tips=null;
+                    this.updateForm.index=null;
+                },
+                randomGeneration(i){
+                    if(i==0){
+                        this.addForm.password=randomPassword(16);
+                        this.addForm.tips="随机密码";
+                    }else{
+                        this.updateForm.password=randomPassword(16);
+                        this.updateForm.tips="随机密码";
+                    }
+                },
+                addSubmit(){
+                    var th = this;
+                    $.post("/account/add",this.addForm,function(result){
+                        if(!result.flag){
+                            th.$message.error(result.msg);
+                        }else{
+                            th.$message({
+                                message: result.msg,
+                                type: 'success'
+                            });
+                            th.account.push({id:result.data,platform:th.addForm.platform,account:th.addForm.account})
+                            th.dialogAddVisible=false;
+                        }
+                    });
+                },
+                updateSubmit(){
+                    var th = this;
+                    $.post("/account/update",this.updateForm,function(result){
+                        if(!result.flag){
+                            th.$message.error(result.msg);
+                        }else{
+                            th.$message({
+                                message: result.msg,
+                                type: 'success'
+                            });
+                            let indexData=th.account[th.updateForm.index];
+                            indexData.platform=th.updateForm.platform;
+                            indexData.account=th.updateForm.account;
+                            th.dialogUpdateVisible=false;
+                        }
+                    });
+                }
+            },
+            watch: {
+                dialogAddVisible:{
+                    handler(newValue, oldValue) {
+                        if(newValue == false){
+                            this.clearAddForm();
+                        }
+                    }
+                },
+                dialogUpdateVisible:{
+                    handler(newValue, oldValue) {
+                        if(newValue == false){
+                            this.clearUpdateForm();
+                        }
+                    }
+                }
+            },
+            mounted:function(){
+                var th = this;
+                $.post("/account/list",{username:""},function(result){
+                    th.account = result.data;
+                });
+            }
+        })
+    }
+</script>
+</html>
