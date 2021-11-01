@@ -2,6 +2,7 @@ package com.weblogb.pwms.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.weblogb.pwms.config.annotation.Cryptogram;
 import com.weblogb.pwms.config.annotation.Decrypt;
 import com.weblogb.pwms.config.annotation.Encrypt;
 import com.weblogb.pwms.model.response.Result;
@@ -35,15 +36,15 @@ public class SafetyAspect {
      * Pointcut 切入点
      * 匹配 com.weblogb.*.controller 包下面的所有方法
      */
-    @Pointcut(value = "execution(public * com.weblogb.*.controller.*.*(..))")
+    @Pointcut("@annotation(com.weblogb.pwms.config.annotation.Cryptogram)")
     public void safetyAspect() {
     }
 
     /**
      * 环绕通知
      */
-    @Around(value = "safetyAspect()")
-    public Object around(ProceedingJoinPoint pjp) {
+    @Around(value = "safetyAspect() && @annotation(cryptogram)")
+    public Object around(ProceedingJoinPoint pjp, Cryptogram cryptogram) {
         try {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if(attributes == null){
@@ -64,18 +65,10 @@ public class SafetyAspect {
             //方法的形参参数
             Object[] args = pjp.getArgs();
 
-            //是否有@Decrypt
-            boolean hasDecrypt = false;
-            //是否有@Encrypt
-            boolean hasEncrypt = false;
-            for (Annotation annotation : annotations) {
-                if (annotation.annotationType() == Decrypt.class) {
-                    hasDecrypt = true;
-                }
-                if (annotation.annotationType() == Encrypt.class) {
-                    hasEncrypt = true;
-                }
-            }
+            //请求参数是否解密
+            boolean hasDecrypt = cryptogram.decrypt();
+            //返回结果是否加密
+            boolean hasEncrypt = cryptogram.encrypt();
 
             //前端公钥
             String publicKey = null;

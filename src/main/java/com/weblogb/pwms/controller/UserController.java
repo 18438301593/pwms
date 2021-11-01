@@ -1,5 +1,6 @@
 package com.weblogb.pwms.controller;
 
+import com.weblogb.pwms.config.annotation.Cryptogram;
 import com.weblogb.pwms.config.annotation.Decrypt;
 import com.weblogb.pwms.config.annotation.Encrypt;
 import com.weblogb.pwms.model.User;
@@ -51,8 +52,7 @@ public class UserController implements ApplicationRunner {
      * @param request
      * @return
      */
-    @Decrypt
-    @Encrypt
+    @Cryptogram
     @PostMapping("dologin")
     public Result dologin(DologinRequest request, HttpSession session){
         if(!alreadyRegister){
@@ -83,8 +83,7 @@ public class UserController implements ApplicationRunner {
      * @param request
      * @return
      */
-    @Decrypt
-    @Encrypt
+    @Cryptogram
     @PostMapping("register")
     public synchronized Result register(DoRegisterRequest request){
         try {

@@ -1,5 +1,6 @@
 package com.weblogb.pwms.controller;
 
+import com.weblogb.pwms.config.annotation.Cryptogram;
 import com.weblogb.pwms.config.annotation.Decrypt;
 import com.weblogb.pwms.config.annotation.Encrypt;
 import com.weblogb.pwms.model.AccPwd;
@@ -35,7 +36,7 @@ public class AccountController {
      * 获取列表
      * @return
      */
-    @Encrypt
+    @Cryptogram(decrypt = false)
     @PostMapping("list")
     public Result list(){
         return Result.of(accountService.list());
@@ -45,8 +46,7 @@ public class AccountController {
      * 录入
      * @return
      */
-    @Encrypt
-    @Decrypt
+    @Cryptogram
     @PostMapping("add")
     public Result add(AccPwd accPwd){
         if(StringUtils.isBlank(accPwd.getPlatform())
@@ -70,8 +70,7 @@ public class AccountController {
      * 录入
      * @return
      */
-    @Encrypt
-    @Decrypt
+    @Cryptogram
     @PostMapping("update")
     public Result update(AccPwd accPwd){
         if(accPwd.getId()==null
@@ -92,8 +91,7 @@ public class AccountController {
      * 删除
      * @return
      */
-    @Encrypt
-    @Decrypt
+    @Cryptogram
     @PostMapping("del")
     public Result del(AccPwd accPwd){
         if(accPwd.getId() == null){
@@ -106,8 +104,7 @@ public class AccountController {
      * 查看密码
      * @return
      */
-    @Encrypt
-    @Decrypt
+    @Cryptogram
     @PostMapping("look")
     public Result look(AccPwd accPwd){
         if(accPwd.getId() == null){
@@ -120,8 +117,7 @@ public class AccountController {
      * 查看提示
      * @return
      */
-    @Encrypt
-    @Decrypt
+    @Cryptogram
     @PostMapping("tips")
     public Result tips(AccPwd accPwd){
         if(accPwd.getId() == null){
