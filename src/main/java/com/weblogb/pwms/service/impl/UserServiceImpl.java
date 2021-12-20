@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
         String password = request.getPassword();
         // 再次对密码加密
         password = SHA256.getSHA256(password);
-        if(user.getPassword()==null && !user.getPassword().equals(password)){
+        if(user.getPassword()==null || !user.getPassword().equals(password)){
             throw new RuntimeException("Wrong user name or password");
         }
         return user;
